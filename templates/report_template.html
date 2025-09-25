@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <title>健康分析报告</title>
+    <style>
+        body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            margin: 40px;
+            color: #2c3e50;
+            background-color: #f7f9fb;
+        }
+        h1, h2 {
+            color: #0a4d68;
+        }
+        .summary {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(10, 77, 104, 0.1);
+            margin-bottom: 30px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 24px;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        th, td {
+            border-bottom: 1px solid #e3ecf2;
+            padding: 12px 16px;
+            text-align: left;
+        }
+        th {
+            background: #0a4d68;
+            color: #ffffff;
+            font-weight: 600;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            background-color: #e1f5fe;
+            color: #0277bd;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .section {
+            margin-bottom: 32px;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .section p {
+            line-height: 1.8;
+            white-space: pre-line;
+        }
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <div class="summary">
+        <h1>健康分析报告</h1>
+        <p><strong>个人ID：</strong>{{ person_id }}</p>
+    </div>
+
+    <div class="section">
+        <h2>核心指标趋势</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>指标</th>
+                    <th>最新值</th>
+                    <th>趋势</th>
+                    <th>历史记录</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in metric_rows %}
+                <tr>
+                    <td>{{ row.name }}</td>
+                    <td>{{ row.latest_value if row.latest_value is not none else '未知' }}</td>
+                    <td>
+                        <span class="badge">{{ row.direction }}</span>
+                        {% if row.change is not none %}
+                        （与上一期差值 {{ '%.2f'|format(row.change) }})
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% for item in row.history %}
+                            <div>{{ item.date }}：{{ item.value }}</div>
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% for key, title in {
+        'data_sources': '数据来源',
+        'risk_assessment': '风险评估',
+        'health_interpretation': '健康解读',
+        'intervention': '干预建议',
+        'follow_up': '随访计划',
+        'evidence': '依据说明',
+        'hotline': '24小时热线电话',
+        'consult_line': '健康咨询电话',
+        'disclaimer': '免责声明'
+    }.items() %}
+    <div class="section">
+        <h2>{{ title }}</h2>
+        <p>{{ sections.get(key, '') }}</p>
+    </div>
+    {% endfor %}
+
+    <footer>
+        <p>提示：本报告由系统自动生成，请结合专业医生意见。</p>
+    </footer>
+</body>
+</html>
